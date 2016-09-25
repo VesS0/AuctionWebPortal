@@ -1,0 +1,112 @@
+﻿@model WebPortalVV.Models.Auction
+@{
+    ViewBag.Title = "Auction";
+}
+
+<script type="text/javascript">
+    function component(x, v) {
+        return Math.floor(x / v);
+    }
+    var time_@Model.idAuction;
+    function timer(t) {
+        time_@Model.idAuction = t;
+        $('#timeVal_@Model.idAuction').val(t)
+        var interval_@Model.idAuction = setInterval(function () {
+            time_@Model.idAuction = $('#timeVal_@Model.idAuction').val();
+            time_@Model.idAuction--;
+            if (time_@Model.idAuction <= 10)
+                $('#time_@Model.idAuction').addClass('text-danger');
+            var days = component(time_@Model.idAuction, 24 * 60 * 60),
+                hours = component(time_@Model.idAuction, 60 * 60) % 24,
+                minutes = component(time_@Model.idAuction, 60) % 60,
+                seconds = component(time_@Model.idAuction, 1) % 60;
+            $('#timeVal_@Model.idAuction').val(time_@Model.idAuction);
+            if(days > 0)
+                $('#time_@Model.idAuction').text(days + " days, " + hours + ":" + minutes + ":" + seconds);
+            else
+                $('#time_@Model.idAuction').text(hours + ":" + minutes + ":" + seconds);
+            if(time_@Model.idAuction <= 0) {
+                $('#time_@Model.idAuction').text("0:0:0");
+                $('#bidAuction_@Model.idAuction').removeClass('btn btn-warning').addClass('btn btn-default disabled readonly');
+                $('#bidAuction_@Model.idAuction').disabled = true;
+                clearInterval(interval_@Model.idAuction);
+              
+            }
+        }, 1000);
+    }
+</script>
+
+
+<div class="col-sm-3">
+    <div class="panel panel-default">
+        <div class="panel-heading text-center" style="min-height: 57px; max-height: 57px;">
+            <h3 class="panel-title text-info"><strong><a href='@Url.Action("Details", "Auctions", new { id = Model.idAuction })'> @Html.DisplayFor(modelItem => Model.product.productName)</a></strong></h3>
+        </div>
+        <div class="panel-body text-center" style="min-height: 350px; max-height: 350px;">
+            @HtmlImage.showimage(Model.product.image) <br />
+            @{ int val = 0;}
+            @if (Model.status == WebPortalVV.Models.AuctionStatus.OPEN)
+            {
+                TimeSpan timeSec = Model.timeClosed.Value - DateTime.Now;
+                <strong><span id="time_@Model.idAuction"></span></strong>
+                <input type="hidden" id="timeVal_@Model.idAuction" />
+                <script>timer(@timeSec.TotalSeconds)</script>
+                val = Model.startingPrice + Model.totalPriceIncrease;
+                
+            }
+            else if (Model.status == WebPortalVV.Models.AuctionStatus.READY)
+            {
+                <span class="text-muted"><strong>Not open</strong></span>
+                val = Model.startingPrice;
+            }
+            else
+            {
+                <span class="text-muted"><strong>Ended</strong></span>
+                val = Model.startingPrice + Model.bidIncrement;
+            }
+            <br />
+            <span class="text-info"><strong>@Model.startingPrice</strong></span>
+            <br />
+            <span id="price_@Model.idAuction" class="text-success"><strong>@val</strong></span>
+            <br />
+
+            @if (Model.status == WebPortalVV.Models.AuctionStatus.OPEN)
+            {
+                var user = "No bids Yet";
+                if (Model.bids.Count > 0)
+                {
+                    DateTime maxDate = Model.bids.Max(m => m.timeSent);
+                    WebPortalVV.Models.Bid bid = Model.bids.Where(m => m.timeSent == maxDate).FirstOrDefault();
+                    user = @bid.biddingUser.UserName;
+                }
+                <div class="row" id="username_@Model.idAuction">@user</div>
+                if (User.IsInRole("User"))
+                {
+                    <div class="row">
+                        <button id="bid_@Model.idAuction" class="btn btn-warning" value="Bid" onclick="bid(@Model.idAuction)">Bid</button>
+                    </div>
+                }
+            }
+            else if (Model.status == WebPortalVV.Models.AuctionStatus.READY)
+            {
+                <span class="btn btn-default disabled">Not open</span>
+            }
+            else if (Model.status == WebPortalVV.Models.AuctionStatus.SOLD)
+            {
+                var user = "No Bids";
+                if (Model.bids.Count > 0)
+                {
+                    DateTime maxDate = Model.bids.Max(m => m.timeSent);
+                    WebPortalVV.Models.Bid bid = Model.bids.Where(m => m.timeSent == maxDate).FirstOrDefault();
+                    user = @bid.biddingUser.UserName;
+                }
+                <div class="row" id="username_@Model.idAuction">@user</div>
+                <span class="btn btn-default disabled">Sold</span>
+            }
+            else
+            {
+                <span class="btn btn-default disabled">Expired</span>
+            }
+        </div>
+    </div>
+</div>

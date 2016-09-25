@@ -1,0 +1,83 @@
+﻿@model WebPortalVV.Models.IndexViewModel
+@{
+    ViewBag.Title = "Manage";
+}
+
+<script type="text/javascript" src="http://stage.centili.com/widget/js/c-mobile-payment-scripts.js"></script>
+
+<h2>@ViewBag.Title.</h2>
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+<div>
+    <h4>Change your account settings</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Name:</dt>
+        <dd>
+           
+                @Model.User.Name
+            [ @Html.ActionLink("Change your Name", "ChangeName")
+            ]
+        </dd>
+        <dt>Surname:</dt>
+        <dd>
+            
+                @Model.User.Surname
+            [ @Html.ActionLink("Change your Surname", "ChangeSurname")
+            ]
+        </dd>
+        <dt>Email:</dt>
+        <dd> 
+           
+                @Model.User.Email
+            [ @Html.ActionLink("Change your Email", "ChangeEmail")
+            ]
+        </dd>
+        <dt>Password:</dt>
+        <dd>
+            [
+            
+            @if (Model.HasPassword)
+            {
+                @Html.ActionLink("Change your password", "ChangePassword")
+            }
+            else
+            {
+                @Html.ActionLink("Create", "SetPassword")
+            }
+            ]
+        </dd>
+
+
+    @if (User.IsInRole("User"))
+        {
+        <dt>Number of Tokens:</dt>
+        <dd>@Model.User.Tokens Buy more: <a id="c-mobile-payment-widget" href="http://stage.centili.com/widget/WidgetModule?api=5244b044022ed1f04dedd6fcd5510cce&clientid=@Model.User.Id"><img src="https://www.centili.com/images/centili-widget-button.png" /></a></dd>
+    }
+        @*
+            Phone Numbers can used as a second factor of verification in a two-factor authentication system.
+             
+             See <a href="http://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
+                for details on setting up this ASP.NET application to support two-factor authentication using SMS.
+             
+             Uncomment the following block after you have set up two-factor authentication
+        *@
+        @*  
+            <dt>Phone Number:</dt>
+            <dd>
+                @(Model.PhoneNumber ?? "None") [
+                @if (Model.PhoneNumber != null)
+                {
+                    @Html.ActionLink("Change", "AddPhoneNumber")
+                    @: &nbsp;|&nbsp;
+                    @Html.ActionLink("Remove", "RemovePhoneNumber")
+                }
+                else
+                {
+                    @Html.ActionLink("Add", "AddPhoneNumber")
+                }
+                ]
+            </dd>
+        *@
+    </dl>
+</div>

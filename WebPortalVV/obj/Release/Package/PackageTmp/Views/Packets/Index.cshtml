@@ -1,0 +1,47 @@
+﻿@model IEnumerable<WebPortalVV.Models.Packet>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>List of all Packages</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.packetName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.packetPrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.numberOfTokens)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.packetName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.packetPrice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.numberOfTokens)
+        </td>
+        <td>
+          
+                @Html.ActionLink("Details", "Details", new { id=item.idPacket }) 
+         
+              
+        </td>
+    </tr>
+
+}
+
+</table>

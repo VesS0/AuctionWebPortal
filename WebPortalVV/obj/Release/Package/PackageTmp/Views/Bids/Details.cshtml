@@ -1,0 +1,26 @@
+﻿@model WebPortalVV.Models.Bid
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Bid</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.timeSent)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.timeSent)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.idBid }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

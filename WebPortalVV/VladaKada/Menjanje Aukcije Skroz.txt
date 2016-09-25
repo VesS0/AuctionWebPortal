@@ -1,0 +1,51 @@
+        // GET: Auctions/Edit/5
+        [System.Web.Mvc.Authorize(Roles = "Admin")]
+        public ActionResult Edit(long? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Auction auction = db.Auctions.Find(id);
+            if (auction == null)
+            {
+                return HttpNotFound();
+            }
+
+            List<SelectListItem> ddl = new List<SelectListItem>();
+            foreach (var pr in db.Products.ToList())
+            {
+                if (notInAuctionOrExpired(pr.idProduct))
+                    ddl.Add(new SelectListItem() { Text = pr.productName, Value = pr.idProduct.ToString() });
+            }
+
+
+            ddl.Add(new SelectListItem() { Text = auction.product.productName, Value = auction.product.idProduct.ToString() });
+
+
+            ViewBag.products = ddl;
+
+            return View(getAuctionCreateFromAuction(auction));
+        }
+
+        // POST: Auctions/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [System.Web.Mvc.Authorize(Roles = "Admin")]
+        public ActionResult Edit(AuctionCreate auctionCreate)
+        {
+            if (ModelState.IsValid)
+            {
+                Auction auction = getAuctionFromAuctionCreate(auctionCreate);
+
+                db.Entry(auction).State = EntityState.Modified;
+
+                //trySaving();
+
+                db.SaveChanges();
+                return RedirectToAction("Auctions");
+            }
+            return View(auctionCreate);
+        }

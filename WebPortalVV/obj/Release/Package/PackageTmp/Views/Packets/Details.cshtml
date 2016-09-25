@@ -1,0 +1,42 @@
+﻿@model WebPortalVV.Models.Packet
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Packet</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.packetPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.packetPrice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.packetName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.packetName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.numberOfTokens)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.numberOfTokens)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.idPacket }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

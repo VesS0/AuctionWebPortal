@@ -1,0 +1,134 @@
+﻿@model PagedList.IPagedList<WebPortalVV.Models.Auction>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<script type="text/javascript">
+    var hub;
+    var bid;
+    $(document).ready(function () {
+        hub = $.connection.auctionHub;
+
+        hub.client.newBid = function (username, id) {
+            var time = $('#timeVal_' + id).val();
+            if (time <= 10)
+                $('#timeVal_' + id).val(10);
+            $("#username_" + id).text(username);
+            var inc = parseInt($("#price_" + id).text()) + 1;
+            $("#price_" + id).text(inc);
+            highlight(id);
+        };
+
+        hub.client.closeAuction = function (id) {
+            $('#time_' + id).text("0:0:0");
+            $('#bid_' + id).removeClass('btn btn-warning').addClass('btn btn-default disabled');
+            $('#bid_' + id).text('Ended');
+            clearInterval('interval_' + id);
+        };
+
+        hub.client.failed = function (message, username) {
+            if('@User.Identity.Name' == username)
+                alert(message);
+        };
+
+        $.connection.hub.start().done(function () {
+            bid = function (id) {
+                var user = ('@User.IsInRole("User")').toLowerCase();
+                if (user == 'true')
+                    hub.server.bid('@User.Identity.Name', id);
+                else
+                    window.location.href = "/Account/Login"
+            }
+        });
+
+        $("#filterByButton").click(function() {
+            if ($('#filterBy').css('display') == 'none') {
+                $("#filterBy").fadeIn("slow");
+            }
+            else {
+                $("#filterBy").fadeOut("slow");
+            }
+        })
+    });
+
+    function highlight(id) {
+        var orig = document.getElementById('price_' + id).style.backgroundColor;
+        document.getElementById('price_' + id).style.backgroundColor = '#99FFCC';
+        setTimeout(function () {
+            document.getElementById('price_' + id).style.backgroundColor = orig;
+        }, 3000);
+    }
+
+</script>
+
+
+<h2 class="text-center">Auctions</h2> <br />
+
+<div class="col">
+
+    @using (Html.BeginForm("Index", "Auctions", FormMethod.Get))
+    {
+        <div class="form-group row">
+            <div class="col-md-2">@Html.Label("Find by name:", new { @class = "control-label" })</div>
+            <div class="col-md-7">@Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { @class = " form-control", @placeholder = "Search live auctions, products and more...", @style = "width:100%" })</div>
+            <div class="col-xs-1"></div>
+            <div class="col-md-2"><button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span>Search</button></div>
+        </div>
+
+            <div >
+                    @Html.Label("Min Price ")
+                    @Html.TextBox("Min", ViewBag.CurrentFilterMin as string, new { @type = "number" })
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    @Html.Label("Max Price ")
+                    @Html.TextBox("Max", ViewBag.CurrentFilterMax as string, new { @type = "number" })
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    @Html.Label("Auction state:  ")
+
+                    @{
+                        List<SelectListItem> listItems = new List<SelectListItem>();
+                        listItems.Add(new SelectListItem
+                        {
+                            Text = "",
+                            Value = null,
+                        });
+                        listItems.Add(new SelectListItem
+                        {
+                            Text = "Ready",
+                            Value = "READY",
+                            Selected = (ViewBag.CurrentFilterStatus != null ? ("Ready" == ViewBag.CurrentFilterStatus as string ? true : false) : false)
+                        });
+                        listItems.Add(new SelectListItem
+                        {
+                            Text = "Open",
+                            Value = "OPEN",
+                            Selected = (ViewBag.CurrentFilterStatus != null ? ("Open" == ViewBag.CurrentFilterStatus as string ? true : false) : false)
+                        });
+                        listItems.Add(new SelectListItem
+                        {
+                            Text = "Sold",
+                            Value = "SOLD",
+                            Selected = (ViewBag.CurrentFilterStatus != null ? ("Sold" == ViewBag.CurrentFilterStatus as string ? true : false) : false)
+                        });
+                        listItems.Add(new SelectListItem
+                        {
+                            Text = "Expired",
+                            Value = "EXPIRED",
+                            Selected = (ViewBag.CurrentFilterStatus != null ? ("Expired" == ViewBag.CurrentFilterStatus as string ? true : false) : false)
+                        });
+                    }
+
+                    @Html.DropDownList("State", listItems)
+
+            </div>
+                        }
+
+    <br />
+    <div class="row">
+        @Html.DisplayForModel()
+    </div>
+    <br />
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, currentFilter = ViewBag.CurrentFilter, currentFilterMin = ViewBag.CurrentFilterMin, currentFilterMax = ViewBag.CurrentFilterMax, currentFilterStatus = ViewBag.currentFilterStatus }))
+</div>

@@ -1,0 +1,39 @@
+﻿@model IEnumerable<WebPortalVV.Models.Product>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.productName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.image)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.productName)
+        </td>
+        <td>
+            @HtmlImage.showimage(item.image)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.idProduct }) |
+            @Html.ActionLink("Details", "Details", new { id=item.idProduct }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.idProduct })
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,55 @@
+﻿@model PagedList.IPagedList<WebPortalVV.Models.Order>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            Packet Name
+        </th>
+        <th>
+            Packet Price
+        </th>
+        <th>
+           Number of Tokens
+        </th>
+        <th>
+           Status
+        </th>
+        <th>
+            Time Created
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.packet.packetName)
+        </td>
+        <th>
+            @Html.DisplayFor(modelItem => item.packet.packetPrice)
+        </th>
+        <th>
+            @Html.DisplayFor(modelItem => item.packet.numberOfTokens)
+        </th>
+        <td>
+            @Html.DisplayFor(modelItem => item.status)
+        </td>
+        <th>
+            @Html.DisplayFor(modelItem => item.timeCreated)
+        </th>
+        <td>
+            @Html.ActionLink("Details", "Details", new { id=item.idOrder }) |
+        </td>
+    </tr>
+}
+
+</table>
+
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page }))

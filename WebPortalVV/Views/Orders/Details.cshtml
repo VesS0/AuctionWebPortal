@@ -1,0 +1,63 @@
+﻿@model WebPortalVV.Models.Order
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Order</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.timeCreated)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.timeCreated)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.status)
+        </dd>
+
+
+        <dt>
+            Packet Name
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.packet.packetName)
+        </dd>
+
+
+        <dt>
+            Packet Price
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.packet.packetPrice)
+        </dd>
+
+        <dt>
+           Tokens in Packet
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.packet.numberOfTokens)
+        </dd>
+
+
+
+
+    </dl>
+</div>
+<p>
+
+    @Html.ActionLink("Back to List", "Index")
+</p>

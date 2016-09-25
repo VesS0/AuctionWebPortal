@@ -1,0 +1,58 @@
+﻿@model PagedList.IPagedList<WebPortalVV.Models.Auction>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Auctions";
+}
+
+<h2 class="text-center">Auctions</h2> <br />
+
+    <p>
+        @Html.ActionLink("Create New", "Create", "", new { @class = "btn btn-primary" })
+    </p>
+
+    <div class="col">
+
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-sm-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading text-center">
+                            <h3 class="panel-title"><a href='@Url.Action("Details", "Auctions", new { id = item.idAuction })'> @Html.DisplayFor(modelItem => item.product.productName)</a></h3>
+                        </div>
+                        <div class="panel-body text-center" style="min-height: 380px; max-height: 380px;">
+                            @HtmlImage.showimage(item.product.image) <br />
+                            @if (item.status == WebPortalVV.Models.AuctionStatus.OPEN)
+                            {
+                                <span class="text-danger"><strong>@TimeSpan.FromSeconds(item.secondsLasting).ToString()</strong></span><br />
+                            }
+                            else if (item.status == WebPortalVV.Models.AuctionStatus.READY || item.status == WebPortalVV.Models.AuctionStatus.DRAFT)
+                            {
+                                <span class="text-muted"><strong>Not open</strong></span> <br />
+                            }
+                            else
+                            {
+                                <span class="text-muted"><strong>Ended</strong></span><br />
+                            }
+                            @Html.DisplayFor(modelItem => item.timeCreated) <br />
+                            @Html.DisplayFor(modelItem => item.startingPrice) <br />
+                            @if (item.status == WebPortalVV.Models.AuctionStatus.DRAFT)
+                            {
+                                @Html.ActionLink("Ready", "Ready", new { id = item.idAuction }, new { @class = "btn btn-primary" })
+                            }
+                            @if (item.status == WebPortalVV.Models.AuctionStatus.READY)
+                            {
+                                @Html.ActionLink("Edit", "Edit", new { id = item.idAuction }) <br />
+                                @Html.ActionLink("Delete", "Delete", new { id = item.idAuction }) <br />
+                                @Html.ActionLink("Open", "Open", new { id = item.idAuction }, new { @class = "btn btn-primary" })
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <br />
+        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+        @Html.PagedListPager(Model, page => Url.Action("Auctions", new { page }))
+    </div>

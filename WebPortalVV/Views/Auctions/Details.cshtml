@@ -1,0 +1,126 @@
+﻿@model WebPortalVV.Models.Auction
+
+@{
+    ViewBag.Title = "Details";
+}
+<script type="text/javascript">
+    var hub;
+    var bid;
+    $(document).ready(function () {
+        hub = $.connection.auctionHub;
+
+        hub.client.newBid = function (username, id) {
+            var time = $('#timeVal_' + id).val();
+            if (time <= 10)
+                $('#timeVal_' + id).val(10);
+            $("#username_" + id).text(username);
+            var inc = parseInt($("#price_" + id).text()) + 1;
+            $("#price_" + id).text(inc);
+            highlight(id);
+            addNameTable(username);
+        };
+
+        hub.client.closeAuction = function (id) {
+            $('#time_' + id).text("0:0:0");
+            $('#bid_' + id).removeClass('btn btn-warning').addClass('btn btn-default disabled');
+            $('#bid_' + id).text('Ended');
+            clearInterval('interval_' + id);
+        };
+
+        hub.client.failed = function (message, username) {
+            if ('@User.Identity.Name' == username)
+                alert(message);
+        };
+
+        $.connection.hub.start().done(function () {
+            bid = function (id) {
+                var user = ('@User.IsInRole("User")').toLowerCase();
+                if (user == 'true')
+                    hub.server.bid('@User.Identity.Name', id);
+                else
+                    window.location.href = "/Account/Login"
+            }
+        });
+
+    });
+
+    function highlight(id) {
+        var orig = document.getElementById('price_' + id).style.backgroundColor;
+        document.getElementById('price_' + id).style.backgroundColor = '#99FFCC';
+        setTimeout(function () {
+            document.getElementById('price_' + id).style.backgroundColor = orig;
+        }, 3000);
+    }
+    var names;
+    function initNames(n) {
+        names = n.split(" ");
+        createTable();
+    }
+    function addNameTable(name) {
+        $("#tablebody tr").remove();
+        names.unshift(name);
+        createTable();
+    }
+    function createTable() {
+        var table = document.getElementById('tablebody');
+        for (var i = 0; i < names.length && i < 10; i++) {
+            if (names[i] != "" && names[i] != " ") {
+                var tr = document.createElement('tr');
+
+                tr.appendChild(document.createElement('td'));
+                tr.appendChild(document.createElement('td'));
+
+                tr.cells[0].appendChild(document.createTextNode(i + 1));
+                tr.cells[1].appendChild(document.createTextNode(names[i]));
+
+                table.appendChild(tr);
+            }
+        }
+    }
+
+</script>
+
+<h2>Details</h2>
+
+<div>
+    <h4>Auction</h4>
+    <hr />
+
+
+    @{
+        string names = "";
+        int i = 0;
+        foreach (WebPortalVV.Models.Bid bid in Model.bids.Reverse())
+        {
+            if (i == 0)
+            {
+                names += bid.biddingUser.UserName;
+            }
+            else
+            {
+                names += " " + bid.biddingUser.UserName;
+            }
+            i++;
+            if (i == 10)
+            {
+                break;
+            }
+        }
+    }
+    <div class="row">
+        @Html.DisplayForModel()
+        <div class="col-sm-3">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Last 10 bidders</th>
+                    </tr>
+                </thead>
+                <tbody id="tablebody"></tbody>
+            </table>
+            <script>
+                initNames('@names')</script>
+        </div>
+    </div>
+</div>

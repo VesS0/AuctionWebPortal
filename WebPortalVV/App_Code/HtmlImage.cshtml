@@ -1,0 +1,4 @@
+﻿@helper showimage(byte[] imgbytes)
+{
+    <img src="data:image;base64,@System.Convert.ToBase64String(imgbytes)" height="200" width="200" />
+}
